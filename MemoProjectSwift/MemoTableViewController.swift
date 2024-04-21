@@ -1,13 +1,13 @@
 //
-//  MemoViewController.swift
+//  MemoTableViewController.swift
 //  MemoProjectSwift
 //
-//  Created by Lexi Francis on 4/21/24.
+//  Created by Lexi Francis on 4/20/24.
 //
 
 import UIKit
 
-class MemoViewController: UITableViewController {
+class MemoTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()

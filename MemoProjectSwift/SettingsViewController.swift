@@ -1,5 +1,5 @@
 //
-//  MemoViewController.swift
+//  SettingsViewController.swift
 //  MemoProjectSwift
 //
 //  Created by Lexi Francis on 4/21/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MemoViewController: UITableViewController {
+class SettingsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
