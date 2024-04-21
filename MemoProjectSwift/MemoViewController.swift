@@ -9,6 +9,18 @@ import UIKit
 
 class MemoViewController: UITableViewController {
 
+    @IBOutlet weak var sgmtEdit: UISegmentedControl!
+    
+    @IBOutlet weak var txtSubject: UITextField!
+    
+    
+    @IBOutlet weak var txtMemo: UITextField!
+    @IBOutlet weak var dateButton: UIButton!
+    @IBOutlet weak var lblDate: UILabel!
+    @IBOutlet weak var mediumButton: UIButton!
+    @IBOutlet weak var lowButton: UIButton!
+    @IBOutlet weak var highButton: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 

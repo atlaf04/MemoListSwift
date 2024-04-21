@@ -43,6 +43,7 @@
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="5c8-JE-7zN">
                                                 <rect key="frame" x="73" y="0.0" width="284.5" height="25.5"/>
+                                                <accessibility key="accessibilityConfiguration" label="txtSubject"/>
                                                 <fontDescription key="fontDescription" name="Georgia" family="Georgia" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
                                             </textField>
@@ -170,11 +171,19 @@
                     <navigationItem key="navigationItem" title="New Memo" id="Ivd-nE-qte"/>
                     <connections>
                         <outlet property="btnChange" destination="5nb-tj-JbR" id="aRV-kW-DHB"/>
+                        <outlet property="dateButton" destination="5nb-tj-JbR" id="9Yx-4V-YD4"/>
+                        <outlet property="highButton" destination="3LE-sA-igv" id="90G-ZO-ytl"/>
                         <outlet property="lblBirthdate" destination="67k-nZ-qys" id="TX9-H2-Dko"/>
+                        <outlet property="lblDate" destination="67k-nZ-qys" id="g9d-bV-Eqn"/>
+                        <outlet property="lowButton" destination="g1i-Xp-fUu" id="CeA-Jg-pWA"/>
+                        <outlet property="mediumButton" destination="WQN-0K-Gf3" id="YIA-Y1-NQJ"/>
                         <outlet property="settingsView" destination="tsR-hK-woN" id="GSW-b6-skq"/>
+                        <outlet property="sgmtEdit" destination="6At-C6-lBY" id="yHb-DP-3tJ"/>
                         <outlet property="sgmtEditMode" destination="6At-C6-lBY" id="9ZP-Ki-Sc3"/>
                         <outlet property="txtAddress" destination="vPW-IR-jiU" id="xeN-ol-dei"/>
+                        <outlet property="txtMemo" destination="vPW-IR-jiU" id="5Tk-Bx-Jt9"/>
                         <outlet property="txtName" destination="5c8-JE-7zN" id="bz0-PT-n0b"/>
+                        <outlet property="txtSubject" destination="5c8-JE-7zN" id="9Zt-BX-xgT"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
