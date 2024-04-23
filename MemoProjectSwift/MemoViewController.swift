@@ -6,11 +6,15 @@
 //
 
 import UIKit
+import CoreData
 
-class MemoViewController: UIViewController {
+class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerDelegate, UINavigationControllerDelegate {
+    
+    var currentMemo: Memo?
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
     @IBOutlet weak var sgmtEdit: UISegmentedControl!
-    
+
     @IBOutlet weak var txtSubject: UITextField!
     
     
@@ -22,27 +26,26 @@ class MemoViewController: UIViewController {
     @IBOutlet weak var highButton: UIButton!
     
     override func viewDidLoad() {
-            super.viewDidLoad()
-            
-            // Setup initial UI state
-            initUI()
-        }
+        super.viewDidLoad()
         
-        // MARK: - UI Configuration
+        // Setup initial UI state
+        initUI()
+    }
         
-        func initUI() {
-            // Configure initial state of UI elements
-            
-            // Set up segmented control action
-            sgmtEdit.addTarget(self, action: #selector(editModeChanged(_:)), for: .valueChanged)
-            
-            // Set up date button action
-            dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
-        }
+    // MARK: - UI Configuration
         
-        // MARK: - Actions
+    func initUI() {
+        // Configure initial state of UI elements
         
-        @objc func editModeChanged(_ sender: UISegmentedControl) {
+        // Set up segmented control action
+        sgmtEdit.addTarget(self, action: #selector(editModeChanged(_:)), for: .valueChanged)
+
+        // Set up date button action
+        dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
+    }
+        
+    // MARK: - Actions
+    @objc func editModeChanged(_ sender: UISegmentedControl) {
             // Handle segmented control value changed event
             
             switch sender.selectedSegmentIndex {
@@ -58,8 +61,21 @@ class MemoViewController: UIViewController {
         }
         
         @objc func changeDate(_ sender: UIButton) {
-            // Handle date button tapped event
-            // Implement your date change logic here
+            // Handle action when the date button is tapped
+            // You can implement the logic to show a date picker or perform any other action related to changing the date
+        }
+        
+        // MARK: - DateControllerDelegate
+        
+        func dateChanged(date: Date) {
+            if currentMemo == nil {
+                let context = appDelegate.persistentContainer.viewContext
+                currentMemo = Memo(context: context)
+            }
+            currentMemo?.date = date
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            lblDate.text = formatter.string(from: date)
         }
         
         // MARK: - Helper Methods
