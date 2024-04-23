@@ -12,24 +12,49 @@ class MemoTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
-    }
-
-    // MARK: - Table view data source
-
+        // Load memos from a data source
+                memo = MemoDataSource.shared.loadMemos() // Implement MemoDataSource
+                
+                // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+                // self.navigationItem.rightBarButtonItem = self.editButtonItem
+            }
+            
+            // MARK: - Table view data source
+        
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
-    }
-
+            return 1 // Assuming one section for all memos
+        }
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
-    }
+            return memos.count
+        }
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "MemoCell", for: indexPath)
+            
+            let memo = memos[indexPath.row]
+            cell.textLabel?.text = memo.title
+            cell.detailTextLabel?.text = memo.content
+            
+            return cell
+        }
+    // Override to support conditional editing of the table view.
+        override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+            return true
+        }
+    // Override to support editing the table view.
+        override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            if editingStyle == .delete {
+                // Delete the memo from the data source
+                           memos.remove(at: indexPath.row)
+                           // Update the table view
+                           tableView.deleteRows(at: [indexPath], with: .fade)
+                       }
+                   }
+    //work on navigation
+        
+        
+        
+        
+  
 
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
