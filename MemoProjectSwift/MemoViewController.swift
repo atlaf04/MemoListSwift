@@ -11,6 +11,8 @@ import CoreData
 class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerDelegate, UINavigationControllerDelegate {
     
     var currentMemo: Memo?
+    var selectedPriority: Int = 0 // Default priority
+        
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
     @IBOutlet weak var sgmtEdit: UISegmentedControl!
@@ -35,15 +37,22 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     // MARK: - UI Configuration
         
     func initUI() {
-        // Configure initial state of UI elements
+            sgmtEdit.addTarget(self, action: #selector(changeEditMode(_:)), for: .valueChanged)
+            dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
         
-        // Set up segmented control action
-        sgmtEdit.addTarget(self, action: #selector(changeEditMode(_:)), for: .valueChanged)
-
-        // Set up date button action
-        dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
-    }
-        
+            lowButton.tag = 1
+            mediumButton.tag = 2 // Assign tags to buttons to identify priorities
+            highButton.tag = 3
+            mediumButton.addTarget(self, action: #selector(priorityButtonTapped(_:)), for: .touchUpInside)
+            lowButton.addTarget(self, action: #selector(priorityButtonTapped(_:)), for: .touchUpInside)
+            highButton.addTarget(self, action: #selector(priorityButtonTapped(_:)), for: .touchUpInside)
+        }
+    
+    @objc func priorityButtonTapped(_ sender: UIButton) {
+            // Handle priority button taps
+            selectedPriority = sender.tag // Set selected priority based on button tag
+        }
+    
     // MARK: - Actions
     @objc func changeEditMode(_ sender: UISegmentedControl) {
             // Handle segmented control value changed event
@@ -92,4 +101,24 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
             
             // Additional UI updates as needed
         }
+    
+    func saveMemo() {
+        let context = appDelegate.persistentContainer.viewContext
+        
+        if let memoText = txtMemo.text, let subject = txtSubject.text {
+            if currentMemo == nil {
+                currentMemo = Memo(context: context)
+            }
+            
+            currentMemo?.priority = Int32((selectedPriority)) // Ensure priority is stored as Int32 --> dependent on size
+            currentMemo?.memo = memoText
+            currentMemo?.subject = subject
+            
+            do {
+                try context.save()
+            } catch {
+                print("Error saving memo: \(error.localizedDescription)")
+            }
+        }
+    }
     }
