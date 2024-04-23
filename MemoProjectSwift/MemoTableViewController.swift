@@ -9,16 +9,16 @@ import UIKit
 import CoreData
 
 class MemoTableViewController: UITableViewController {
-    
-    var memos: [NSManagedObject] = []
+
+    var memos: [Memo] = []
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.leftBarButtonItem = self.editButtonItem
         loadDataFromDatabase()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadDataFromDatabase()
@@ -29,17 +29,15 @@ class MemoTableViewController: UITableViewController {
         let settings = UserDefaults.standard
         let sortField = settings.string(forKey: Constants.kSortField) ?? ""
         let sortAscending = settings.bool(forKey: Constants.kSortDirectionAscending)
-        
+
         let context = appDelegate.persistentContainer.viewContext
-        let request = NSFetchRequest<NSManagedObject>(entityName: "Memo")
-        let sortDescriptor = NSSortDescriptor(key: sortField, ascending: sortAscending)
-        let sortDescriptorArray = [sortDescriptor]
-        request.sortDescriptors = sortDescriptorArray
-        
+        let request: NSFetchRequest<Memo> = Memo.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)]
+
         do {
             memos = try context.fetch(request)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
+        } catch {
+            print("Could not fetch memos: \(error)")
         }
     }
 
@@ -55,11 +53,11 @@ class MemoTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemoCell", for: indexPath)
-        
+
         let memo = memos[indexPath.row]
-        cell.textLabel?.text = memo.value(forKey: "title") as? String
-        cell.detailTextLabel?.text = memo.value(forKey: "content") as? String
-        
+        cell.textLabel?.text = memo.memo
+        cell.detailTextLabel?.text = memo.subject
+
         return cell
     }
 
@@ -71,22 +69,22 @@ class MemoTableViewController: UITableViewController {
         if editingStyle == .delete {
             let context = appDelegate.persistentContainer.viewContext
             context.delete(memos[indexPath.row])
-            
+
             do {
                 try context.save()
                 loadDataFromDatabase()
                 tableView.deleteRows(at: [indexPath], with: .fade)
-            } catch let error as NSError {
-                print("Could not save. \(error), \(error.userInfo)")
+            } catch {
+                print("Could not save context after deleting memo: \(error)")
             }
         }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedMemo = memos[indexPath.row]
-        let title = selectedMemo.value(forKey: "title") as? String ?? ""
-        let content = selectedMemo.value(forKey: "content") as? String ?? ""
-        
+        let title = selectedMemo.subject ?? ""
+        let content = selectedMemo.memo ?? ""
+
         let alertController = UIAlertController(title: "Memo selected",
                                                 message: "Title: \(title)\nContent: \(content)",
                                                 preferredStyle: .alert)

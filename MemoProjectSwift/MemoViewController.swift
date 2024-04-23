@@ -113,6 +113,7 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
             currentMemo?.priority = Int32((selectedPriority)) // Ensure priority is stored as Int32 --> dependent on size
             currentMemo?.memo = memoText
             currentMemo?.subject = subject
+            currentMemo?.date = Date() // Set the date to the current date
             
             do {
                 try context.save()
