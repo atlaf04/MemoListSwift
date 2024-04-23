@@ -56,7 +56,7 @@ class MemoTableViewController: UITableViewController {
 
         let memo = memos[indexPath.row]
         cell.textLabel?.text = memo.memo
-        cell.detailTextLabel?.text = memo.subject
+        cell.detailTextLabel?.text = "\(memo.subject ?? "") - \(memo.date?.description ?? "")" // Include date in detail text label
 
         return cell
     }
