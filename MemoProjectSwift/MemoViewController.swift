@@ -38,14 +38,14 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
         // Configure initial state of UI elements
         
         // Set up segmented control action
-        sgmtEdit.addTarget(self, action: #selector(editModeChanged(_:)), for: .valueChanged)
+        sgmtEdit.addTarget(self, action: #selector(changeEditMode(_:)), for: .valueChanged)
 
         // Set up date button action
         dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
     }
         
     // MARK: - Actions
-    @objc func editModeChanged(_ sender: UISegmentedControl) {
+    @objc func changeEditMode(_ sender: UISegmentedControl) {
             // Handle segmented control value changed event
             
             switch sender.selectedSegmentIndex {
