@@ -56,11 +56,13 @@ class MemoTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemosCell", for: indexPath)
-        //configure cell
+
+        // Configure cell
         let memo = memos[indexPath.row] as? Memo
         cell.textLabel?.text = memo?.value(forKey: "title") as? String
-        cell.detailTextLabel?.text = memo!.value(forKey: "content") as? String
+        cell.detailTextLabel?.text = "\(memo?.value(forKey: "content") as? String ?? "") - Priority: \(memo?.value(forKey: "priority") as? Int ?? 0) - Date: \(memo?.value(forKey: "date") as? String ?? "")"
         cell.accessoryType = .detailDisclosureButton
+
         return cell
     }
        
