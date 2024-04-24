@@ -74,7 +74,7 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
             return // Exiting if instantiation fails
         }
         dateViewController.delegate = self // Setting the delegate
-        navigationController?.pushViewController(dateViewController, animated: true) // Pushing the DateViewController onto the navigation stack
+        navigationController?.pushViewController(dateViewController, animated: true) // Pushing the DateViewController onto the navigation
     }
     
     func dateChanged(date: Date) { // Defining a method to handle date changes
@@ -124,43 +124,49 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
             return // Exiting if currentMemo is nil
         }
         
-        switch sender.selectedSegmentIndex {
-
-        case 0:
-            currentMemo.priority = 1
-        case 1:
-            currentMemo.priority = 2
-        case 2:
-            currentMemo.priority = 3
-        default:
-            currentMemo.priority = 0
+        switch sender.selectedSegmentIndex { // Checking the selected segment index of a segmented control
+            
+            case 0: // If the index is 0
+                currentMemo.priority = 1 // Setting the priority of the current memo to 1 (high priority)
+                
+            case 1: // If the index is 1
+                currentMemo.priority = 2 // Setting the priority of the current memo to 2 (medium priority)
+                
+            case 2: // If the index is 2
+                currentMemo.priority = 3 // Setting the priority of the current memo to 3 (low priority)
+                
+            default: // If none of the above cases match
+                currentMemo.priority = 0 // Setting the priority of the current memo to 0 as a default value
         }
     }
     
     func populateUIWithMemoDetails() {
-        guard let memo = currentMemo else {
-            return
+        guard let memo = currentMemo else {// Checking if there's a current memo to populate UI with
+            return// Exiting the function if there's no current memo
         }
         
-        txtSubject.text = memo.subject
-        txtMemo.text = memo.memo
+        txtSubject.text = memo.subject // Setting the subject text field with memo's subject
+        txtMemo.text = memo.memo // Setting the memo text field with memo's text
         
-        if let date = memo.date {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            lblDate.text = formatter.string(from: date)
-        }
+        if let date = memo.date { // Checking if memo has a date
+                let formatter = DateFormatter() // Creating a date formatter
+                formatter.dateStyle = .short // Setting the date style to short
+                lblDate.text = formatter.string(from: date) // Setting label text to formatted date
+            }
         
         // Set the selected segment based on the memo's priority
         switch memo.priority {
-        case 1:
-            pSegment.selectedSegmentIndex = 0 // High Priority
-        case 2:
-            pSegment.selectedSegmentIndex = 1 // Medium Priority
-        case 3:
-            pSegment.selectedSegmentIndex = 2 // Low Priority
-        default:
-            pSegment.selectedSegmentIndex = UISegmentedControl.noSegment
-        }
+        case 1: // If priority is 1
+                    pSegment.selectedSegmentIndex = 0 // Selecting the high priority segment
+                    
+                case 2: // If priority is 2
+                    pSegment.selectedSegmentIndex = 1 // Selecting the medium priority segment
+                    
+                case 3: // If priority is 3
+                    pSegment.selectedSegmentIndex = 2 // Selecting the low priority segment
+                    
+                default: // If the priority is anything else (including 0 or unexpected values)
+                    pSegment.selectedSegmentIndex = UISegmentedControl.noSegment // Deselecting all segments in the segmented control
+            }
     }
 }

@@ -7,34 +7,34 @@
 
 import UIKit
 
-protocol DateControllerDelegate: AnyObject {
-    func dateChanged(date: Date)
+protocol DateControllerDelegate: AnyObject { // Defining a protocol named DateControllerDelegate
+    func dateChanged(date: Date) // Declaring a method to notify delegate when date changes
 }
 
-class DateViewController: UIViewController, DateControllerDelegate {
-    func dateChanged(date: Date) {
+class DateViewController: UIViewController, DateControllerDelegate { // Creating a class named DateViewController which is a subclass of UIViewController and adopting DateControllerDelegate protocol
+    
+    func dateChanged(date: Date) { // Implementing the method to handle date changes
         
     }
     
+    weak var delegate: DateControllerDelegate? // Declaring a weak delegate property of type DateControllerDelegate
     
-    weak var delegate: DateControllerDelegate?
+    @IBOutlet weak var dtpDate: UIDatePicker! // Declaring an outlet for a date picker named dtpDate
     
-    @IBOutlet weak var dtpDate: UIDatePicker!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidLoad() { // Overriding the viewDidLoad method
+        super.viewDidLoad() // Calling the viewDidLoad method of the superclass
         
-        let saveButton: UIBarButtonItem =
-        UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.save,
-                        target: self,
-                        action: #selector(saveDate))
-        self.navigationItem.rightBarButtonItem = saveButton
-        self.title = "Pick Date"
+        let saveButton: UIBarButtonItem = // Creating a save button for navigation bar
+        UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.save, // Setting the system item to save
+                        target: self, // Setting the target to self
+                        action: #selector(saveDate)) // Setting the action to saveDate method
+        self.navigationItem.rightBarButtonItem = saveButton // Adding the save button to the navigation bar
+        self.title = "Pick Date" // Setting the title of the view controller
     }
     
-    @objc func saveDate(){ 
-        self.delegate?.dateChanged(date: dtpDate.date)
-        self.navigationController?.popViewController(animated: true)
+    @objc func saveDate(){ // Defining a method to save the selected date
+        self.delegate?.dateChanged(date: dtpDate.date) // Notifying the delegate about the date change
+        self.navigationController?.popViewController(animated: true) // Popping the view controller from the navigation stack
     }
     
     // MARK: - Navigation
