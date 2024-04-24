@@ -63,8 +63,8 @@ class MemoTableViewController: UITableViewController {
 
         // Configure cell
         let memo = memos[indexPath.row] as? Memo
-        cell.textLabel?.text = memo?.value(forKey: "title") as? String
-        cell.detailTextLabel?.text = "\(memo?.value(forKey: "content") as? String ?? "") - Priority: \(memo?.value(forKey: "priority") as? Int ?? 0) - Date: \(formatDate(memo?.value(forKey: "date") as? Date))"
+        cell.textLabel?.text = memo?.value(forKey: "subject") as? String
+        cell.detailTextLabel?.text = "\(memo?.value(forKey: "memo") as? String ?? "") - Priority: \(memo?.value(forKey: "priority") as? Int ?? 0) - Date: \(formatDate(memo?.value(forKey: "date") as? Date))"
         cell.accessoryType = .detailDisclosureButton
 
         return cell

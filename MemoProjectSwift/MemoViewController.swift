@@ -28,6 +28,7 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     @IBOutlet weak var highButton: UIButton!
     @IBOutlet var settingsView: UIView!
 
+    //@IBOutlet weak var settingsView: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,33 +53,88 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     
     @objc func priorityButtonTapped(_ sender: UIButton) {
             // Handle priority button taps
-            selectedPriority = sender.tag // Set selected priority based on button tag
+        selectedPriority = sender.tag // Set selected priority based on button tag
+        switch sender {
+            case lowButton:
+                selectedPriority = 1
+            case mediumButton:
+                selectedPriority = 2
+            case highButton:
+                selectedPriority = 3
+            default:
+                break
+            }
+        
         }
     
     // MARK: - Actions
     @objc func changeEditMode(_ sender: UISegmentedControl) {
-            // Handle segmented control value changed event
-            
-            switch sender.selectedSegmentIndex {
-            case 0:
-                // Editing mode off
-                enableEditing(false)
-            case 1:
-                // Editing mode on
-                enableEditing(true)
-            default:
-                break
+        let textFields: [UITextField] = [txtMemo, txtSubject]
+        if sgmtEdit.selectedSegmentIndex == 0 {
+            for textField in textFields {
+                textField.isEnabled = false
+                textField.borderStyle = UITextField.BorderStyle.none
             }
+            dateButton.isHidden = true
+            navigationItem.rightBarButtonItem = nil
+        }
+        else if sgmtEdit.selectedSegmentIndex == 1{
+            for textField in textFields {
+                textField.isEnabled = true
+                textField.borderStyle = UITextField.BorderStyle.roundedRect
+            }
+            dateButton.isHidden = false
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
+                                                                target: self,
+                                                                action: #selector(self.saveMemo))
+        }
+    }
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if currentMemo == nil {
+            let context = appDelegate.persistentContainer.viewContext
+            currentMemo = Memo(context: context)
+        }
+        currentMemo?.memo = txtMemo.text
+        currentMemo?.subject = txtSubject.text
+        return true
+    }
+    
+    @objc func changeDate(_ sender: UIButton) { // button
+        // Show a date picker to choose a new date
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .date
+        
+        // Check if the currentMemo has a date set, if so, set the date picker to that date
+        if let currentDate = currentMemo?.date {
+            datePicker.date = currentDate
         }
         
-        @objc func changeDate(_ sender: UIButton) {
-            // Handle action when the date button is tapped
-            // You can implement the logic to show a date picker or perform any other action related to changing the date
+        // Create an alert controller with a date picker
+        let alertController = UIAlertController(title: "Select Date", message: nil, preferredStyle: .actionSheet)
+        alertController.view.addSubview(datePicker)
+        
+        // Add actions to the alert controller
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let doneAction = UIAlertAction(title: "Done", style: .default) { _ in
+            // Update the currentMemo's date with the selected date
+            self.currentMemo?.date = datePicker.date
+            
+            // Update the date label with the selected date
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            self.lblDate.text = formatter.string(from: datePicker.date)
         }
+        
+        alertController.addAction(cancelAction)
+        alertController.addAction(doneAction)
+        
+        // Present the alert controller
+        present(alertController, animated: true, completion: nil)
+    }
         
         // MARK: - DateControllerDelegate
         
-        func dateChanged(date: Date) {
+    func dateChanged(date: Date) { // updates the label
             if currentMemo == nil {
                 let context = appDelegate.persistentContainer.viewContext
                 currentMemo = Memo(context: context)
@@ -104,7 +160,7 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
             // Additional UI updates as needed
         }
     
-    func saveMemo() {
+    @objc func saveMemo() {
         let context = appDelegate.persistentContainer.viewContext
         
         if let memoText = txtMemo.text, let subject = txtSubject.text {
