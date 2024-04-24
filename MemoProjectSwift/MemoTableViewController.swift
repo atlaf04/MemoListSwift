@@ -29,14 +29,18 @@ class MemoTableViewController: UITableViewController {
         let settings = UserDefaults.standard
         let sortField = settings.string(forKey: Constants.kSortField)
         let sortAscending = settings.bool(forKey: Constants.kSortDirectionAscending)
-        //Set up Core Data Context
+        
+        // Set up Core Data Context
         let context = appDelegate.persistentContainer.viewContext
-        //request
-        let request = NSFetchRequest<NSManagedObject>(entityName: "Memo")
-        let sortDescriptor = NSSortDescriptor(key: sortField, ascending: sortAscending)
-        let sortDescriptorArray = [sortDescriptor]
-        //to sort by multiple fields, add more sort descriptors to the array
-        request.sortDescriptors = sortDescriptorArray
+        
+        // Create fetch request
+        let request: NSFetchRequest<Memo> = Memo.fetchRequest()
+        
+        // Set sort descriptors
+        if let sortField = sortField {
+            request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)]
+        }
+        
         do {
             memos = try context.fetch(request)
         } catch let error as NSError {
@@ -60,7 +64,7 @@ class MemoTableViewController: UITableViewController {
         // Configure cell
         let memo = memos[indexPath.row] as? Memo
         cell.textLabel?.text = memo?.value(forKey: "title") as? String
-        cell.detailTextLabel?.text = "\(memo?.value(forKey: "content") as? String ?? "") - Priority: \(memo?.value(forKey: "priority") as? Int ?? 0) - Date: \(memo?.value(forKey: "date") as? String ?? "")"
+        cell.detailTextLabel?.text = "\(memo?.value(forKey: "content") as? String ?? "") - Priority: \(memo?.value(forKey: "priority") as? Int ?? 0) - Date: \(formatDate(memo?.value(forKey: "date") as? Date))"
         cell.accessoryType = .detailDisclosureButton
 
         return cell
@@ -166,6 +170,16 @@ class MemoTableViewController: UITableViewController {
                 memoController?.currentMemo = selectedMemo!
             }
         }
+    
+    func formatDate(_ date: Date?) -> String {
+        if let date = date {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMM dd, yyyy HH:mm"
+            return dateFormatter.string(from: date)
+        } else {
+            return "N/A"
+        }
+    }
     }
     /*
      
