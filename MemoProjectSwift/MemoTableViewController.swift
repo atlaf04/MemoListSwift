@@ -26,7 +26,6 @@ class MemoTableViewController: UITableViewController {
     }
     
     func loadDataFromDatabase() {
-<<<<<<< HEAD
         let settings = UserDefaults.standard
         let sortField = settings.string(forKey: Constants.kSortField)
         let sortAscending = settings.bool(forKey: Constants.kSortDirectionAscending)
@@ -46,30 +45,8 @@ class MemoTableViewController: UITableViewController {
             memos = try context.fetch(request)
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
-=======
-            let settings = UserDefaults.standard
-            let sortField = settings.string(forKey: Constants.kSortField)
-            let sortAscending = settings.bool(forKey: Constants.kSortDirectionAscending)
-            
-            // Set up Core Data Context
-            let context = appDelegate.persistentContainer.viewContext
-            
-            // Create fetch request
-            let request: NSFetchRequest<Memo> = Memo.fetchRequest()
-            
-            // Set sort descriptors
-            if let sortField = sortField {
-                request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)]
-            }
-            
-            do {
-                memos = try context.fetch(request)
-            } catch let error as NSError {
-                print("Could not fetch. \(error), \(error.userInfo)")
-            }
->>>>>>> 70e45525479a9c934d6e75a0c9ea624020c9b57d
         }
-    //Notes: sortField is safely unwrapped and provides a default sort order if it's nil. also it casts the fetched results to [Memo] instead of [NSManagedObject].
+    }
     
     // MARK: - Table view data source
     
