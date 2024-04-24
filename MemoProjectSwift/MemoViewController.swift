@@ -11,7 +11,7 @@ import CoreData
 class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerDelegate, UINavigationControllerDelegate {
     
     var currentMemo: Memo?
-    
+    var selectedDate: Date?
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     @IBOutlet weak var sgmtEdit: UISegmentedControl!
@@ -24,12 +24,9 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Setup initial UI state
         initUI()
-        
-        // Enable or disable editing based on segmented control value
         enableEditing(sgmtEdit.selectedSegmentIndex == 1)
+        populateUIWithMemoDetails()
     }
     
     // MARK: - UI Configuration
@@ -60,8 +57,6 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
                                                                 target: self,
                                                                 action: #selector(saveMemo))
         }
-        
-        // Enable or disable editing based on segmented control value
         enableEditing(sgmtEdit.selectedSegmentIndex == 1)
     }
     
@@ -76,29 +71,22 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     }
     
     @objc func changeDate(_ sender: UIButton) {
-        print("Change Date button pressed")
-        // Instantiate the DateViewController from the storyboard
-        guard let dateViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DateViewController") as? DateViewController else {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let dateViewController = storyboard.instantiateViewController(withIdentifier: "DateViewController") as? DateViewController else {
             return
         }
-        
-        // Set MemoViewController as the delegate of DateViewController
         dateViewController.delegate = self
-        
-        // Present the DateViewController
         navigationController?.pushViewController(dateViewController, animated: true)
     }
     
     func dateChanged(date: Date) {
-        print("Date changed to: \(date)")
-        // Update the label text with the selected date
+        selectedDate = date
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         lblDate.text = formatter.string(from: date)
     }
     
     func enableEditing(_ enabled: Bool) {
-        // Enable or disable editing for text fields and buttons
         txtSubject.isEnabled = enabled
         txtMemo.isEnabled = enabled
         dateButton.isEnabled = enabled
@@ -108,36 +96,31 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     @objc func saveMemo() {
         let context = appDelegate.persistentContainer.viewContext
         
-        if let memoText = txtMemo.text, let subject = txtSubject.text {
-            if currentMemo == nil {
-                currentMemo = Memo(context: context)
+        guard let memoText = txtMemo.text, let subject = txtSubject.text else {
+            return
+        }
+        
+        if currentMemo == nil {
+            currentMemo = Memo(context: context)
+        }
+        
+        currentMemo?.memo = memoText
+        currentMemo?.subject = subject
+        currentMemo?.date = selectedDate
+        
+        // No need to set priority here
+        
+        do {
+            try context.save()
+            if let memoTableViewController = navigationController?.viewControllers.first as? MemoTableViewController {
+                memoTableViewController.loadDataFromDatabase()
+                memoTableViewController.tableView.reloadData()
             }
-            
-            // Set memo properties
-            currentMemo?.memo = memoText
-            currentMemo?.subject = subject
-            currentMemo?.date = Date() // Set the date to the current date
-            
-            // Set priority based on segmented control value
-            switch pSegment.selectedSegmentIndex {
-            case 0:
-                currentMemo?.priority = 1 // Assuming 1 represents high priority
-            case 1:
-                currentMemo?.priority = 2 // Assuming 2 represents medium priority
-            case 2:
-                currentMemo?.priority = 3 // Assuming 3 represents low priority
-            default:
-                currentMemo?.priority = 0 // Set default priority or handle it according to your requirement
-            }
-            
-            // Save changes
-            do {
-                try context.save()
-            } catch {
-                print("Error saving memo: \(error.localizedDescription)")
-            }
+        } catch {
+            print("Error saving memo: \(error.localizedDescription)")
         }
     }
+    
     @IBAction func prioritySegmentChanged(_ sender: UISegmentedControl) {
         guard let currentMemo = currentMemo else {
             return
@@ -145,15 +128,40 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
         
         switch sender.selectedSegmentIndex {
         case 0:
-            currentMemo.priority = 1 // Assuming 1 represents high priority
+            currentMemo.priority = 1
         case 1:
-            currentMemo.priority = 2 // Assuming 2 represents medium priority
+            currentMemo.priority = 2
         case 2:
-            currentMemo.priority = 3 // Assuming 3 represents low priority
+            currentMemo.priority = 3
         default:
-            currentMemo.priority = 0 // Set default priority or handle it according to your requirement
+            currentMemo.priority = 0
+        }
+    }
+    
+    func populateUIWithMemoDetails() {
+        guard let memo = currentMemo else {
+            return
+        }
+        
+        txtSubject.text = memo.subject
+        txtMemo.text = memo.memo
+        
+        if let date = memo.date {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            lblDate.text = formatter.string(from: date)
+        }
+        
+        // Set the selected segment based on the memo's priority
+        switch memo.priority {
+        case 1:
+            pSegment.selectedSegmentIndex = 0 // High Priority
+        case 2:
+            pSegment.selectedSegmentIndex = 1 // Medium Priority
+        case 3:
+            pSegment.selectedSegmentIndex = 2 // Low Priority
+        default:
+            pSegment.selectedSegmentIndex = UISegmentedControl.noSegment
         }
     }
 }
-
-

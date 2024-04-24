@@ -38,7 +38,12 @@ class MemoTableViewController: UITableViewController {
         
         // Set sort descriptors
         if let sortField = sortField {
-            request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)]
+            if sortField == "priority" {
+                request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending),
+                                           NSSortDescriptor(key: "date", ascending: true)]
+            } else {
+                request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)]
+            }
         }
         
         do {
@@ -47,7 +52,6 @@ class MemoTableViewController: UITableViewController {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
     }
-    
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -72,11 +76,11 @@ class MemoTableViewController: UITableViewController {
         if let plevel = plevel {
             switch plevel {
             case 1:
-                txtpriority = "High"
+                txtpriority = "Low Priority"
             case 2:
-                txtpriority = "Medium"
+                txtpriority = "Medium Priority"
             case 3:
-                txtpriority = "Low"
+                txtpriority = "High Priority"
             default:
                 txtpriority = "Unknown"
             }
@@ -88,38 +92,66 @@ class MemoTableViewController: UITableViewController {
 
         return cell
     }
-    
-       
-        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            let selectedMemo = memos[indexPath.row] as? Memo
-            // getting the contact object associated with the selected row
-            let memo = selectedMemo!.subject!
-            let actionHandler = { (action:UIAlertAction!) -> Void in
-                let storyboard = UIStoryboard(name: "Main", bundle: nil) // gets a reference to the storyboard named Main
-                let controller = storyboard.instantiateViewController(withIdentifier: "MemoViewController")// instantiates an instance of the view controller using an identifier.
-                as? MemoViewController
-                controller?.currentMemo = selectedMemo
-                self.navigationController?.pushViewController(controller!, animated: true)
-                
-                //  navigation controller used to push the view controller onto the navigation stack. ensuring the controller has the Back button functionality
-            }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedMemo = memos[indexPath.row] as? Memo
+        // getting the contact object associated with the selected row
+        let memo = selectedMemo!.subject!
+        let actionHandler = { (action:UIAlertAction!) -> Void in
+            let storyboard = UIStoryboard(name: "Main", bundle: nil) // gets a reference to the storyboard named Main
+            let controller = storyboard.instantiateViewController(withIdentifier: "MemoViewController")// instantiates an instance of the view controller using an identifier.
+            as? MemoViewController
+            controller?.currentMemo = selectedMemo // Pass the selected memo to MemoViewController
+            self.navigationController?.pushViewController(controller!, animated: true)
             
-            let alertController = UIAlertController(title: "Memo selected",
-                                                    message:  "Selected row: \(indexPath.row) (\(memo))",
-                preferredStyle: .alert)
-            // UIAlertController with a title and message, can either be .alert (which we are using) or .actionsheet. The action sheet is used when more than two or three options are needed, as it stacks the buttons on top of each other.
-            
-            let actionCancel = UIAlertAction(title: "Cancel",
-                                             style: .cancel,
-                                             handler: nil) // add the two buttons to the Alert Controller, and line 20 displays the controller.
-            let actionDetails = UIAlertAction(title: "Show Details",
-                                              style: .default,
-                                              handler: actionHandler)
-            alertController.addAction(actionCancel)
-            alertController.addAction(actionDetails)
-            present(alertController, animated: true, completion: nil)
+            //  navigation controller used to push the view controller onto the navigation stack. ensuring the controller has the Back button functionality
         }
         
+        let alertController = UIAlertController(title: "Memo selected",
+                                                message:  "Selected row: \(indexPath.row) (\(memo))",
+            preferredStyle: .alert)
+        // UIAlertController with a title and message, can either be .alert (which we are using) or .actionsheet. The action sheet is used when more than two or three options are needed, as it stacks the buttons on top of each other.
+        
+        let actionCancel = UIAlertAction(title: "Cancel",
+                                         style: .cancel,
+                                         handler: nil) // add the two buttons to the Alert Controller, and line 20 displays the controller.
+        let actionDetails = UIAlertAction(title: "Show Details",
+                                          style: .default,
+                                          handler: actionHandler)
+        alertController.addAction(actionCancel)
+        alertController.addAction(actionDetails)
+        present(alertController, animated: true, completion: nil)
+    }
+//
+//        override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//            let selectedMemo = memos[indexPath.row] as? Memo
+//            // getting the contact object associated with the selected row
+//            let memo = selectedMemo!.subject!
+//            let actionHandler = { (action:UIAlertAction!) -> Void in
+//                let storyboard = UIStoryboard(name: "Main", bundle: nil) // gets a reference to the storyboard named Main
+//                let controller = storyboard.instantiateViewController(withIdentifier: "MemoViewController")// instantiates an instance of the view controller using an identifier.
+//                as? MemoViewController
+//                controller?.currentMemo = selectedMemo
+//                self.navigationController?.pushViewController(controller!, animated: true)
+//                
+//                //  navigation controller used to push the view controller onto the navigation stack. ensuring the controller has the Back button functionality
+//            }
+//            
+//            let alertController = UIAlertController(title: "Memo selected",
+//                                                    message:  "Selected row: \(indexPath.row) (\(memo))",
+//                preferredStyle: .alert)
+//            // UIAlertController with a title and message, can either be .alert (which we are using) or .actionsheet. The action sheet is used when more than two or three options are needed, as it stacks the buttons on top of each other.
+//            
+//            let actionCancel = UIAlertAction(title: "Cancel",
+//                                             style: .cancel,
+//                                             handler: nil) // add the two buttons to the Alert Controller, and line 20 displays the controller.
+//            let actionDetails = UIAlertAction(title: "Show Details",
+//                                              style: .default,
+//                                              handler: actionHandler)
+//            alertController.addAction(actionCancel)
+//            alertController.addAction(actionDetails)
+//            present(alertController, animated: true, completion: nil)
+//        }
+//        
         /*
          // Override to support conditional editing of the table view.
          override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -179,7 +211,7 @@ class MemoTableViewController: UITableViewController {
          }
          */
         
-        override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
             if segue.identifier == "EditMemo" {
                 let memoController = segue.destination as? MemoViewController
                 let selectedRow = self.tableView.indexPath(for: sender as! UITableViewCell)?.row
@@ -189,11 +221,16 @@ class MemoTableViewController: UITableViewController {
         }
     
     func formatDateShort(_ date: Date?) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-        return dateFormatter.string(from: date ?? Date())
+        guard let date = date else {
+            return ""
+        }
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
+
     }
     /*
      

@@ -11,7 +11,11 @@ protocol DateControllerDelegate: AnyObject {
     func dateChanged(date: Date)
 }
 
-class DateViewController: UIViewController {
+class DateViewController: UIViewController, DateControllerDelegate {
+    func dateChanged(date: Date) {
+        
+    }
+    
     
     weak var delegate: DateControllerDelegate?
     
@@ -19,11 +23,11 @@ class DateViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         let saveButton: UIBarButtonItem =
-            UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.save,
-                            target: self,
-                            action: #selector(saveDate))
+        UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.save,
+                        target: self,
+                        action: #selector(saveDate))
         self.navigationItem.rightBarButtonItem = saveButton
         self.title = "Pick Date"
     }
@@ -32,16 +36,19 @@ class DateViewController: UIViewController {
         self.delegate?.dateChanged(date: dtpDate.date)
         self.navigationController?.popViewController(animated: true)
     }
-    /*
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "YourSegueIdentifier" { // Replace "YourSegueIdentifier" with the actual segue identifier
+            if let destinationVC = segue.destination as? DateViewController {
+                destinationVC.delegate = self // Assuming the main view controller adopts the DateControllerDelegate protocol
+            }
+        }
+        
+        
     }
-    */
-
 }
 // You now have a new file in your project DateViewController, which will be used to manage any actions on the Birthdate scene. This file will contain the DateControllerDelegate interface, as well as a reference to a delegate that it can use to specify the date that was picked.
 // Switch to DateViewController.swift and add lines 3–5 in Listing 11.13.
@@ -54,6 +61,4 @@ class DateViewController: UIViewController {
 
 // Step 3: Specify That Main View Will Implement Delegate Protocol Switch to ContactsViewController.swift and specify that the class will conform to DateControllerDelegate by adding it to the list of interfaces in the class declaration:
 
-// class ContactsViewController: UIViewController, UITextFieldDelegate, DateControllerDelegate {
-
-
+// class ContactsViewController: UIViewController, UITextFieldDelegate, DateControllerDelegate
