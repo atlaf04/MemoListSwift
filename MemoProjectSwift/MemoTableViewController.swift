@@ -25,41 +25,41 @@ class MemoTableViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    func loadDataFromDatabase() {
-        let settings = UserDefaults.standard
-        let sortField = settings.string(forKey: Constants.kSortField)
-        let sortAscending = settings.bool(forKey: Constants.kSortDirectionAscending)
-        
-        // Set up Core Data Context
-        let context = appDelegate.persistentContainer.viewContext
-        
-        // Create fetch request
-        let request: NSFetchRequest<Memo> = Memo.fetchRequest()
-        
-        // Set sort descriptors
-        if let sortField = sortField {
-            if sortField == "priority" {
-                request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending),
-                                           NSSortDescriptor(key: "date", ascending: true)]
-            } else {
-                request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)]
+    func loadDataFromDatabase() { // Defining a method to load data from the database
+            let settings = UserDefaults.standard // Accessing UserDefaults
+            let sortField = settings.string(forKey: Constants.kSortField) // Getting the sort field from UserDefaults
+            let sortAscending = settings.bool(forKey: Constants.kSortDirectionAscending) // Getting the sort direction from UserDefaults
+            
+            // Set up Core Data Context
+            let context = appDelegate.persistentContainer.viewContext // Accessing the Core Data managed object context
+            
+            // Create fetch request
+            let request: NSFetchRequest<Memo> = Memo.fetchRequest() // Creating a fetch request for Memo objects
+            
+            // Set sort descriptors
+            if let sortField = sortField { // Checking if sortField exists
+                if sortField == "priority" { // If sorting by priority
+                    request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending),
+                                               NSSortDescriptor(key: "date", ascending: true)] // Sorting by priority and then by date
+                } else {
+                    request.sortDescriptors = [NSSortDescriptor(key: sortField, ascending: sortAscending)] // Sorting by other fields
+                }
             }
-        }
         
-        do {
-            memos = try context.fetch(request)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
+        do { // Starting a do-catch block for error handling
+                    memos = try context.fetch(request) // Fetching memos from Core Data
+                } catch let error as NSError { // Catching any errors
+                    print("Could not fetch. \(error), \(error.userInfo)") // Printing error message
+                }
     }
     // MARK: - Table view data source
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+    override func numberOfSections(in tableView: UITableView) -> Int { // Overriding the method to return the number of sections in the table view
+        return 1//returning one section
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return memos.count
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {// Overriding the method to return the number of rows in the section
+        return memos.count // Returning the number of memos
     }
     
 
@@ -68,22 +68,27 @@ class MemoTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemosCell", for: indexPath)
 
         // Configure cell
-        let memo = memos[indexPath.row] as? Memo
-        cell.textLabel?.text = memo?.subject
-        let tdate = formatDateShort(memo?.date)
-        let plevel = memo?.priority
-        var txtpriority: String
-        if let plevel = plevel {
-            switch plevel {
-            case 1:
-                txtpriority = "Low Priority"
-            case 2:
-                txtpriority = "Medium Priority"
-            case 3:
-                txtpriority = "High Priority"
-            default:
-                txtpriority = "Unknown"
-            }
+               let memo = memos[indexPath.row] as? Memo // Getting the memo object for the current row
+               cell.textLabel?.text = memo?.subject // Setting the cell's text label to memo's subject
+               let tdate = formatDateShort(memo?.date) // Formatting memo's date
+               let plevel = memo?.priority // Getting memo's priority level
+               var txtpriority: String // Declaring a variable to hold priority text
+               
+               if let plevel = plevel { // Checking if priority level exists
+                   switch plevel { // Switching on priority level
+                       
+                       case 1: // If priority is 1
+                           txtpriority = "Low Priority" // Setting priority text to "Low Priority"
+                           
+                       case 2: // If priority is 2
+                           txtpriority = "Medium Priority" // Setting priority text to "Medium Priority"
+                           
+                       case 3: // If priority is 3
+                           txtpriority = "High Priority" // Setting priority text to "High Priority"
+                           
+                       default: // Handling default case
+                           txtpriority = "Unknown" // Setting priority text to "Unknown"
+                   }
         } else {
             txtpriority = "Unknown"
         }
