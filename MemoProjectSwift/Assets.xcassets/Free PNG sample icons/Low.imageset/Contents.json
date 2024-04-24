@@ -1,16 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "Low.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "sample-920-handbag@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "Screenshot 2024-04-24 at 2.58.50 AM.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
