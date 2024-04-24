@@ -26,7 +26,10 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
     @IBOutlet weak var mediumButton: UIButton!
     @IBOutlet weak var lowButton: UIButton!
     @IBOutlet weak var highButton: UIButton!
-    //@IBOutlet weak var settingsView: UIView!
+    @IBOutlet var settingsView: UIView!
+    
+    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
