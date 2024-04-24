@@ -11,84 +11,60 @@ import CoreData
 class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerDelegate, UINavigationControllerDelegate {
     
     var currentMemo: Memo?
-    var selectedPriority: Int = 0 // Default priority
-        
+    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
+    
     @IBOutlet weak var sgmtEdit: UISegmentedControl!
-
     @IBOutlet weak var txtSubject: UITextField!
-    
-    
     @IBOutlet weak var txtMemo: UITextField!
     @IBOutlet weak var dateButton: UIButton!
     @IBOutlet weak var lblDate: UILabel!
-    @IBOutlet weak var mediumButton: UIButton!
-    @IBOutlet weak var lowButton: UIButton!
-    @IBOutlet weak var highButton: UIButton!
     @IBOutlet var settingsView: UIView!
-
-    //@IBOutlet weak var settingsView: UIView!
+    @IBOutlet var pSegment: UISegmentedControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Setup initial UI state
         initUI()
+        
+        // Enable or disable editing based on segmented control value
+        enableEditing(sgmtEdit.selectedSegmentIndex == 1)
     }
-        
+    
     // MARK: - UI Configuration
-        
+    
     func initUI() {
-            sgmtEdit.addTarget(self, action: #selector(changeEditMode(_:)), for: .valueChanged)
-            dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
-        
-            lowButton.tag = 1
-            mediumButton.tag = 2 // Assign tags to buttons to identify priorities
-            highButton.tag = 3
-            mediumButton.addTarget(self, action: #selector(priorityButtonTapped(_:)), for: .touchUpInside)
-            lowButton.addTarget(self, action: #selector(priorityButtonTapped(_:)), for: .touchUpInside)
-            highButton.addTarget(self, action: #selector(priorityButtonTapped(_:)), for: .touchUpInside)
-        }
+        sgmtEdit.addTarget(self, action: #selector(changeEditMode(_:)), for: .valueChanged)
+        dateButton.addTarget(self, action: #selector(changeDate(_:)), for: .touchUpInside)
+        pSegment.addTarget(self, action: #selector(prioritySegmentChanged(_:)), for: .valueChanged)
+    }
     
-    @objc func priorityButtonTapped(_ sender: UIButton) {
-            // Handle priority button taps
-        selectedPriority = sender.tag // Set selected priority based on button tag
-        switch sender {
-            case lowButton:
-                selectedPriority = 1
-            case mediumButton:
-                selectedPriority = 2
-            case highButton:
-                selectedPriority = 3
-            default:
-                break
-            }
-        
-        }
-    
-    // MARK: - Actions
     @objc func changeEditMode(_ sender: UISegmentedControl) {
         let textFields: [UITextField] = [txtMemo, txtSubject]
+        
         if sgmtEdit.selectedSegmentIndex == 0 {
             for textField in textFields {
                 textField.isEnabled = false
-                textField.borderStyle = UITextField.BorderStyle.none
+                textField.borderStyle = .none
             }
             dateButton.isHidden = true
             navigationItem.rightBarButtonItem = nil
-        }
-        else if sgmtEdit.selectedSegmentIndex == 1{
+        } else {
             for textField in textFields {
                 textField.isEnabled = true
-                textField.borderStyle = UITextField.BorderStyle.roundedRect
+                textField.borderStyle = .roundedRect
             }
             dateButton.isHidden = false
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
                                                                 target: self,
-                                                                action: #selector(self.saveMemo))
+                                                                action: #selector(saveMemo))
         }
+        
+        // Enable or disable editing based on segmented control value
+        enableEditing(sgmtEdit.selectedSegmentIndex == 1)
     }
+    
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         if currentMemo == nil {
             let context = appDelegate.persistentContainer.viewContext
@@ -99,66 +75,35 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
         return true
     }
     
-    @objc func changeDate(_ sender: UIButton) { // button
-        // Show a date picker to choose a new date
-        let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .date
-        
-        // Check if the currentMemo has a date set, if so, set the date picker to that date
-        if let currentDate = currentMemo?.date {
-            datePicker.date = currentDate
+    @objc func changeDate(_ sender: UIButton) {
+        print("Change Date button pressed")
+        // Instantiate the DateViewController from the storyboard
+        guard let dateViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DateViewController") as? DateViewController else {
+            return
         }
         
-        // Create an alert controller with a date picker
-        let alertController = UIAlertController(title: "Select Date", message: nil, preferredStyle: .actionSheet)
-        alertController.view.addSubview(datePicker)
+        // Set MemoViewController as the delegate of DateViewController
+        dateViewController.delegate = self
         
-        // Add actions to the alert controller
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        let doneAction = UIAlertAction(title: "Done", style: .default) { _ in
-            // Update the currentMemo's date with the selected date
-            self.currentMemo?.date = datePicker.date
-            
-            // Update the date label with the selected date
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            self.lblDate.text = formatter.string(from: datePicker.date)
-        }
-        
-        alertController.addAction(cancelAction)
-        alertController.addAction(doneAction)
-        
-        // Present the alert controller
-        present(alertController, animated: true, completion: nil)
+        // Present the DateViewController
+        navigationController?.pushViewController(dateViewController, animated: true)
     }
-        
-        // MARK: - DateControllerDelegate
-        
-    func dateChanged(date: Date) { // updates the label
-            if currentMemo == nil {
-                let context = appDelegate.persistentContainer.viewContext
-                currentMemo = Memo(context: context)
-            }
-            currentMemo?.date = date
-            let formatter = DateFormatter()
-            formatter.dateStyle = .short
-            lblDate.text = formatter.string(from: date)
-        }
-        
-        // MARK: - Helper Methods
-        
-        func enableEditing(_ enabled: Bool) {
-            // Enable or disable editing for text fields and buttons
-            
-            txtSubject.isEnabled = enabled
-            txtMemo.isEnabled = enabled
-            dateButton.isEnabled = enabled
-            mediumButton.isEnabled = enabled
-            lowButton.isEnabled = enabled
-            highButton.isEnabled = enabled
-            
-            // Additional UI updates as needed
-        }
+    
+    func dateChanged(date: Date) {
+        print("Date changed to: \(date)")
+        // Update the label text with the selected date
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        lblDate.text = formatter.string(from: date)
+    }
+    
+    func enableEditing(_ enabled: Bool) {
+        // Enable or disable editing for text fields and buttons
+        txtSubject.isEnabled = enabled
+        txtMemo.isEnabled = enabled
+        dateButton.isEnabled = enabled
+        pSegment.isEnabled = enabled
+    }
     
     @objc func saveMemo() {
         let context = appDelegate.persistentContainer.viewContext
@@ -168,11 +113,24 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
                 currentMemo = Memo(context: context)
             }
             
-            currentMemo?.priority = Int32((selectedPriority)) // Ensure priority is stored as Int32 --> dependent on size
+            // Set memo properties
             currentMemo?.memo = memoText
             currentMemo?.subject = subject
             currentMemo?.date = Date() // Set the date to the current date
             
+            // Set priority based on segmented control value
+            switch pSegment.selectedSegmentIndex {
+            case 0:
+                currentMemo?.priority = 1 // Assuming 1 represents high priority
+            case 1:
+                currentMemo?.priority = 2 // Assuming 2 represents medium priority
+            case 2:
+                currentMemo?.priority = 3 // Assuming 3 represents low priority
+            default:
+                currentMemo?.priority = 0 // Set default priority or handle it according to your requirement
+            }
+            
+            // Save changes
             do {
                 try context.save()
             } catch {
@@ -180,4 +138,22 @@ class MemoViewController: UIViewController, UITextFieldDelegate, DateControllerD
             }
         }
     }
+    @IBAction func prioritySegmentChanged(_ sender: UISegmentedControl) {
+        guard let currentMemo = currentMemo else {
+            return
+        }
+        
+        switch sender.selectedSegmentIndex {
+        case 0:
+            currentMemo.priority = 1 // Assuming 1 represents high priority
+        case 1:
+            currentMemo.priority = 2 // Assuming 2 represents medium priority
+        case 2:
+            currentMemo.priority = 3 // Assuming 3 represents low priority
+        default:
+            currentMemo.priority = 0 // Set default priority or handle it according to your requirement
+        }
     }
+}
+
+

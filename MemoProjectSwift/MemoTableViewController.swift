@@ -58,19 +58,36 @@ class MemoTableViewController: UITableViewController {
         return memos.count
     }
     
+
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemosCell", for: indexPath)
 
         // Configure cell
         let memo = memos[indexPath.row] as? Memo
-        cell.textLabel?.text = memo?.value(forKey: "subject") as? String
-        cell.detailTextLabel?.text = "\(memo?.value(forKey: "memo") as? String ?? "") - Priority: \(memo?.value(forKey: "priority") as? Int ?? 0) - Date: \(formatDate(memo?.value(forKey: "date") as? Date))"
+        cell.textLabel?.text = memo?.subject
+        let tdate = formatDateShort(memo?.date)
+        let plevel = memo?.priority
+        var txtpriority: String
+        if let plevel = plevel {
+            switch plevel {
+            case 1:
+                txtpriority = "High"
+            case 2:
+                txtpriority = "Medium"
+            case 3:
+                txtpriority = "Low"
+            default:
+                txtpriority = "Unknown"
+            }
+        } else {
+            txtpriority = "Unknown"
+        }
+        cell.detailTextLabel?.text = tdate + " " + txtpriority
         cell.accessoryType = .detailDisclosureButton
 
         return cell
     }
-       
-    // textLabel property of the cell to set the text that will show up on screen. The data is pulled from the contacts array using the requested row number as the index.
     
        
         override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -171,14 +188,11 @@ class MemoTableViewController: UITableViewController {
             }
         }
     
-    func formatDate(_ date: Date?) -> String {
-        if let date = date {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MMM dd, yyyy HH:mm"
-            return dateFormatter.string(from: date)
-        } else {
-            return "N/A"
-        }
+    func formatDateShort(_ date: Date?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .short
+        return dateFormatter.string(from: date ?? Date())
     }
     }
     /*
