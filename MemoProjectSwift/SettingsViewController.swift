@@ -12,7 +12,10 @@ class SettingsViewController: UIViewController, UIPickerViewDataSource, UIPicker
     @IBOutlet weak var pckSortField: UIPickerView!
     @IBOutlet weak var swAscending: UISwitch!
     @IBOutlet var settingsView: UIView!
+<<<<<<< HEAD
 
+=======
+>>>>>>> 70e45525479a9c934d6e75a0c9ea624020c9b57d
     
     // Array of strings, type annotation, let declares constant, items in array are  initialization value this is what is in the sort order
     let sortOrderItems: Array<String> = ["subject", "date", "priority"]
